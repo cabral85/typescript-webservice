@@ -1,0 +1,29 @@
+version: "3.8"
+services:
+  dynamodb:
+    image: amazon/dynamodb-local:latest
+    networks:
+      - app-network
+    ports:
+      - 8000:8000
+  rabbitmq:
+    image: rabbitmq:3.8-management
+    networks:
+      - app-network
+    ports:
+      - 5672:5672
+      - 15672:15672
+  stock-service:
+    image: deliverymuch/backend-challenge:stock-service
+    networks:
+      - app-network
+    environment:
+      - RABBITMQ_URL=amqp://rabbitmq
+    depends_on:
+      - rabbitmq
+    links:
+      - rabbitmq
+    restart: on-failure
+networks:
+  app-network:
+    driver: bridge
